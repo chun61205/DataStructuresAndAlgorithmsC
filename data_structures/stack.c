@@ -1,34 +1,19 @@
 #include<stdlib.h>
 #include<stdbool.h>
-
-typedef struct
-{
-    int data; //The data type of data is modifiable.
-}stack;
-
-stack *createStack(size_t); 
-bool isFullStack(stack*, size_t, int);
-bool isEmptyStack(stack*, size_t, int);
-stack *reallocStack(stack*, size_t, int, size_t);
-void pushStack(stack*, size_t, int, stack);
-void popStack(stack*, size_t, int);
-//void printStack(stack*);
+#include"stack.h"
 
 stack *createStack(size_t capacity)
 {
     return (stack*)malloc(capacity*sizeof(stack));
 }
-
 bool isFullStack(stack *s, size_t capacity, int top)
 {
     return ((top >= (capacity-1)) && (top != -1)); //The size_t data type is unsigned which means if top is equal to -1, the function will return true, and this if out of the requirement. Therefor we add a statement "top != -1" behind.
 }
-
 bool isEmptyStack(stack *s, size_t capacity, int top)
 {
     return (top==-1);
 }
-
 stack *reallocStack(stack *s, size_t capacity, int top, size_t newCapacity)
 {
     if(top >= newCapacity)
@@ -39,7 +24,6 @@ stack *reallocStack(stack *s, size_t capacity, int top, size_t newCapacity)
     free(s);
     return new_s;
 }
-
 void pushStack(stack *s, size_t capacity, int top, stack item)
 {
     if(is_full_stack(s, capacity, top))
@@ -48,7 +32,6 @@ void pushStack(stack *s, size_t capacity, int top, stack item)
     s[top] = item;
     return;
 }
-
 void popStack(stack *s, size_t capacity, int top)
 {
     if(isEmptyStack(s, capacity, top))
