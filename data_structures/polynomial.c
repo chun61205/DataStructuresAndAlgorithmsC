@@ -1,195 +1,159 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdbool.h>
-#include<ctype.h>
-#include<math.h>
-#include"polynomial.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <ctype.h>
+#include <math.h>
+#include "polynomial.h"
 
-poly *create_poly(size_t capacity)
+poly *createPoly(size_t capacity)
 {
-    return (poly*)calloc(capacity, sizeof(poly));
-}
-int get_degree_poly(poly *p, size_t capacity, size_t size)
-{
-    return p->exp;
-}
-double get_lead_coef_poly(poly *p, size_t capacity, size_t size)
-{
-    return p->coef;
-}
-int get_size_poly(poly *p, size_t capacity, size_t size)
-{
-    int size = -1;
-    for(int i=0; i<capacity; i++)
-    {
-        if((p+i)->coef == 0)
-        {
-            size = i;
-            break;
-        }
-    }
-    if(size == -1)
-        size = capacity;
-    return size;
-}
-bool is_zero_poly(poly *p, size_t capacity, size_t size)
-{
-    if(p->coef==0)
-        return true;
-    else
-        return false;
-}
-poly *realloc_poly(poly *p, size_t capacity, size_t size, size_t new_capacity)
-{
-    if(new_capacity < size)
+    poly *p = (poly*)malloc(sizeof(poly));
+    if(!p){
+        fprintf(stderr, "Memory allocation failed!\n");
         exit(EXIT_FAILURE);
-    poly *new_p = creating_poly(new_capacity);
-    copy_poly(p, size, new_p, new_capacity);
-    free(p);
-    return new_p;
+    }
+    p->function = (functionPoly*)calloc(capacity, sizeof(functionPoly));
+    if(!p->function){
+        free(p);
+        fprintf(stderr, "Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+    p->function->coef = 0;
+    p->function->exp = 0;
+    p->capacity = capacity;
+    p->size = 0;
+    return p;
 }
-void remove_poly(poly *p, size_t capacity, size_t size, int exp)
-{
-    int index=-1;
-    for(int i=0; i<size; i++)
-    {
-        if((p+i)->exp == exp)
-        {
+int getDegreePoly(poly *p){
+    if(p->size == 0)
+        return 0;
+    return p->function->exp;
+}
+double getLeadCoefPoly(poly *p){
+    if(p->size == 0)
+        return 0;
+    return p->function->coef;
+}
+bool isZeroPoly(poly *p){
+    return(p->size == 0 || (p->size == 1 && p->function->coef == 0));
+}
+poly *reallocPoly(poly *p, size_t newCapacity){
+    if(newCapacity < p->size){
+        fprintf(stderr, "New capacity is less than current size!\n");
+        exit(EXIT_FAILURE);
+    }
+    functionPoly *newFunction = (functionPoly*)realloc(p->function, newCapacity * sizeof(functionPoly));
+    if(!newFunction){
+        fprintf(stderr, "Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+    p->function = newFunction;
+    p->capacity = newCapacity;
+    return p;
+}
+void removePoly(poly *p, int exp){
+    int index = -1;
+    for(int i = 0; i < p->size; i++){
+        if((p->function + i)->exp == exp){
             index = i;
             break;
         }
     }
-    if(index!=-1)
-    {
-        for(int i=index; i<size; i++)
-        {
-            (p+i)->exp = (p+i+1)->coef;
-            (p+i)->coef = (p+i+1)->coef;
+    if(index != -1){
+        for(int i = index; i < (p->size) - 1; i++){
+            p->function[i] = p->function[i + 1];
         }
-        (p+size)->exp = 0;
-        (p+size)->coef = 0;
+        
+        p->size--;
+    }else{
+        fprintf(stderr, "The term with exponent %d is not found!\n", exp);
     }
-    else
-        exit(EXIT_FAILURE);
-    return;
 }
-poly *add_poly(poly *p1, size_t capacity1, size_t size1, poly *p2, size_t capacity2, size_t size2)
-{
-    poly *result = (poly*)calloc(size1+size2,sizeof(poly));
-    int i1=0,i2=0,i=0;
-    for(i=0; i1<size1 || i2<size2; i++)
-    {
-        if((p1+i1)->exp > (p2+i2)->exp)
-        {
-            (result+i)->exp=(p1+i1)->exp;
-            (result+i)->coef=(p1+i1)->coef;
+poly *addPoly(poly *p1, poly *p2) {
+    poly *result = createPoly(p1->size + p2->size);
+    size_t i1 = 0, i2 = 0, i = 0;
+
+    while(i1 < p1->size && i2 < p2->size){
+        if((p1->function + i1)->exp > (p2->function + i2)->exp){
+            result->function[i++] = p1->function[i1++];
+        }else if((p1->function + i1)->exp < (p2->function + i2)->exp){
+            result->function[i++] = p2->function[i2++];
+        }else{
+            double sum = (p1->function + i1)->coef + (p2->function + i2)->coef;
+            if(sum != 0){  // Only add if the coefficient is non-zero
+                (result->function + i)->exp = (p1->function + i1)->exp;
+                (result->function + i)->coef = sum;
+                i++;
+            }
             i1++;
-        }
-        else if((p1+i1)->exp < (p2+i2)->exp)
-        {
-            (result+i)->exp=(p2+i2)->exp;
-            (result+i)->coef=(p2+i2)->coef;
             i2++;
         }
-        else
-        {
-            if((p1+i1)->coef+(p2+i2)->coef != 0)
-            {
-                (result+i)->exp=(p1+i1)->exp;
-                (result+i)->coef=((p1+i1)->coef+(p2+i2)->coef);
-                i1++;
-                i2++;
+    }
+
+    while(i1 < p1->size)
+        result->function[i++] = p1->function[i1++];
+    while(i2 < p2->size)
+        result->function[i++] = p2->function[i2++];
+    
+    result->size = i;
+    return result;
+}
+poly *multPoly(poly *p1, poly *p2){
+    poly *result = createPoly(p1->size * p2->size);
+    for(int i = 0; i < p1->size; i++){
+        for(int j = 0; j < p2->size; j++){
+            int exp = (p1->function + i)->exp + (p2->function + j)->exp;
+            double coef = (p1->function + i)->coef * (p2->function + j)->coef;
+
+            if(coef != 0){
+                bool found = false;
+                for(size_t k = 0; k < result->size; k++){
+                    if ((result->function + k)->exp == exp){
+                        (result->function + k)->coef += coef;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found){
+                    (result->function +result->size)->exp = exp;
+                    (result->function + result->size)->coef = coef;
+                    result->size++;
+                }
             }
-        }
-    }
-    if(i1 < size1 && i2 < size2)
-        return result;
-    else if(i1 < size1)
-    {
-        for(; i2 < size2; i2++, i++)
-        {
-            (result+i)->exp=(p2+i2)->exp;
-            (result+i)->coef=(p2+i2)->coef;
-        }
-    }
-    else if(i2 < size2)
-    {
-        for(; i1 < size1; i1++, i++)
-        {
-            (result+i)->exp=(p1+i1)->exp;
-            (result+i)->coef=(p1+i1)->coef;
         }
     }
     return result;
 }
-poly *mult_poly(poly *p1, size_t capacity1, size_t size1, poly *p2, size_t capacity2, size_t size2)
-{
-    poly *result = (poly*)calloc(size1*size2,sizeof(poly));
-    int size=0;
-    for(int i1=0; i1<size1; i1++)
-    {   
-        for(int i2=0; i2<size2; i2++)
-        {
-            int exp=(p1+i1)->exp * (p2+i2)->exp, coef=(p1+i1)->coef * (p2+i2)->coef;
-            int index=-1;
-            for(int i=0; i<size; i++)
-            {
-                if((result+i)->exp < exp)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if(index!=-1)
-            {
-                for(int i=size-1; i>=index; i--)
-                {
-                    (result+i)->exp = (result+i+1)->exp;
-                    (result+i)->coef = (result+i+1)->coef;
-                }
-                (result+index)->exp = exp;
-                (result+index)->coef = coef;
-            }
-            else
-            {
-                (result+size)->exp = exp;
-                (result+size)->coef = coef;
-            }
-            if(size==0)
-            {
-                result->coef = coef;
-                result->exp = exp;
-            }
-            size++;
-        }
+double evaluatePoly(poly *p, double x){
+    double result = 0.0;
+    for(int i = 0; i < p->size; i++){
+        result += (p->function + i)->coef * pow(x, (p->function + i)->exp);
     }
     return result;
 }
-double evaluate_poly(poly *p, size_t capacity, size_t size, double x)
+void copyPoly(poly *p1, poly *p2)
 {
-    double sum;
-    for(int i=0; i<size; i++)
-        sum+= (p+i)->coef * pow(x,(p+i)->exp);
-    return sum;
-}
-void copy_poly(poly *p1, size_t capacity1, size_t size1, poly *p2, size_t capacity2, size_t size2)
-{
-    if(capacity2 < size1)
+    if(p2->capacity < p1->size){
         exit(EXIT_FAILURE);
-    else
-    {
-        for(int i=0; i<size1; i++)
-        {
-            (p1+i)->coef = (p2+i)->coef;
-            (p1+i)->exp = (p2+i)->exp;
-        }
     }
+
+    for(size_t i = 0; i < p1->size; i++){
+        (p2->function + i)->coef = (p1->function + i)->coef;
+        (p2->function + i)->exp = (p1->function + i)->exp;
+    }
+
+    p2->size = p1->size;
+
     return;
 }
-void print_poly(poly *p, size_t capacity, size_t size)
-{
-    for(int i=0; i<size-1; i++)
-        printf("%dx^%d+", (p+i)->coef, (p+i)->exp);
-    printf("%dx^%d", (p+size-1)->coef, (p+size-1)->exp);
-    return;
+void printPoly(poly *p){
+    if(p->size == 0){
+        printf("0\n");
+        return;
+    }
+    for(int i = 0; i < p->size - 1; i++){
+        printf("%.2lfx^%d + ", (p->function + i)->coef, (p->function + i)->exp);
+    }
+    printf("%.2lfx^%d\n", (p->function + p->size - 1)->coef, (p->function + p->size - 1)->exp);
 }

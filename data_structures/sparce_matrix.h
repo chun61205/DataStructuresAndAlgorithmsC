@@ -1,19 +1,25 @@
 #ifndef SM_H
 #define SM_H
 
-typedef struct
-{
-    int row,col;
+typedef struct{
+    int row, col;
     double val;
+}nodeSm;
+
+typedef struct{
+    nodeSm *node;
+    int row, col;
+    size_t capacity;
+    size_t size;
 }sm;
 
-sm *create_sm(int, size_t, size_t);
-sm *realloc_sm(sm*, size_t, size_t);
-void *insert_sm(sm*, size_t, int, int, double);
-sm *transpose_sm(sm*,size_t);
-sm *add_sm(sm*, size_t, sm*, size_t);
-sm *mult_sm(sm*, size_t, sm*, size_t);
-void copy_sm(sm*, size_t, sm*, size_t);
-//void *print_sm(sm*);
+sm *createSm(int, int, int);
+sm *reallocSm(sm*, size_t);
+void insertSm(sm*, int, int, double);
+sm *transposeSm(sm*);
+sm *addSm(sm*, sm*);
+sm *multSm(sm*, sm*);
+void copySm(sm*, sm*);
+//void *printSm(sm*);
 
 #endif

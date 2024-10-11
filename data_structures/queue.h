@@ -1,20 +1,32 @@
 #ifndef POLY_H
 #define POLY_H
 
-typedef struct
-{
+typedef struct{
     int data; //The data type of data is modifiable.
-}queue;
+}nodeQueue;
 
-queue *createArrayQ(size_t);
-bool isFullLinearArrayQ(queue*, size_t, int, int);
-bool isFullCircularArrayQ(queue*, size_t, int, int);
-bool isEmptyLinearArrayQ(queue*, size_t, int, int);
-bool isEmptyCircularArrayQ(queue*, size_t, int, int);
-queue *reallocArrayQ(queue*, size_t, int, int, size_t);
-void addLinearArrayQ(queue*, size_t, int, int, queue);
-void addCircularArrayQ(queue*, size_t, int, int, queue);
-void deleteLinearArrayQ(queue*, size_t, int, int);
-void deleteCircularArrayQ(queue*, size_t, int, int);
+typedef struct{
+    nodeQueue *node;
+    size_t capacity;
+    int front, rear;
+}linearQueue;
+
+typedef struct{
+    nodeQueue *node;
+    size_t capacity;
+    int front, rear;
+}circularQueue;
+
+linearQueue *createLinearQueue(size_t);
+bool isFullLinearQueue(linearQueue*);
+bool isEmptyLinearQueue(linearQueue*);
+void addLinearQueue(linearQueue*, nodeQueue);
+void deleteLinearQueue(linearQueue*);
+
+circularQueue *createCircularQueue(size_t);
+bool isFullCircularQueue(circularQueue*);
+bool isEmptyCircularQueue(circularQueue*);
+void addCircularQueue(circularQueue*, nodeQueue);
+void deleteCircularQueue(circularQueue*);
 
 #endif
