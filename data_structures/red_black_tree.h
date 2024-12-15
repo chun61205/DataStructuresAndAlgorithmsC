@@ -1,12 +1,12 @@
-#ifndef POLY_H
-#define POLY_H
+#ifndef RBT_H
+#define RBT_H
 
 typedef enum{
     RED, BLACK
 }Color;
 
 typedef struct{
-    int data; //The data type of data is modifiable.
+    int key;
     Color color;
     struct nodeRBT *left, *right, *parent;
 }nodeRBT;
@@ -18,6 +18,9 @@ typedef struct{
 
 rbt *createRBT();
 nodeRBT *createNodeRBT(rbt*, int);
+nodeRBT *findMinRBT(rbt*);
+nodeRBT *findMaxRBT(rbt*);
+nodeRBT *findSuccessorRBT(nodeRBT*);
 void leftRotateRBT(rbt*, nodeRBT*);
 void rightRotateRBT(rbt*, nodeRBT*);
 void insertRBT(rbt*, int);

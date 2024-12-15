@@ -1,5 +1,5 @@
-#ifndef POLY_H
-#define POLY_H
+#ifndef QUEUE_H
+#define QUEUE_H
 
 typedef struct{
     int data; //The data type of data is modifiable.

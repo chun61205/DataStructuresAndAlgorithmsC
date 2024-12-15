@@ -15,15 +15,52 @@ rbt *createRBT(){
 
     return tree;
 }
-nodeRBT *createNodeRBT(rbt *tree, int data){
+
+nodeRBT *createNodeRBT(rbt *tree, int key){
     nodeRBT *node = (nodeRBT*)malloc(sizeof(nodeRBT));
-    node->data = data;
+    node->key = key;
     node->color = RED;
     node->left = tree->nil;
     node->right = tree->nil;
     node->parent = NULL;
     return node;
 }
+
+nodeRBT *findMinRBT(rbt *tree){
+    nodeRBT *current = tree->root;
+    while(current != tree->nil && current->left != tree->nil){
+        current = current->left;
+    }
+
+    return current;
+}
+
+nodeRBT *findMaxRBT(rbt *tree){
+    nodeRBT *current = tree->root;
+
+    while(current != tree->nil && current->right != tree->nil){
+        current = current->right;
+    }
+
+    return current;
+}
+
+nodeRBT *findSuccessorRBT(nodeRBT *node){
+    if(node->right != tree->nil){
+        return findMinRBT(node->right);
+    }
+
+    nodeRBT *current = node;
+    nodeRBT *parent = current->parent;
+
+    while(parent != NULL && current == parent->right){
+        current = parent;
+        parent = parent->parent;
+    }
+
+    return parent;
+}
+
 void leftRotateRBT(rbt *tree, nodeRBT *x){
     rbtNode *y = x->right;
     x->right = y->left;
@@ -41,6 +78,7 @@ void leftRotateRBT(rbt *tree, nodeRBT *x){
     y->left = x;
     x->parent = y;
 }
+
 void rightRotateRBT(rbt *tree, nodeRBT *y){
     nodeRBT *x = y->left;
     y->left = x->right;
@@ -58,16 +96,17 @@ void rightRotateRBT(rbt *tree, nodeRBT *y){
     x->right = y;
     y->parent = x;
 }
-void insertRBT(rbt *tree, int data){
+
+void insertRBT(rbt *tree, int key){
     // Node creation
-    nodeRBT *newNode = createNode(data, tree);
+    nodeRBT *newNode = createNode(key, tree);
     nodeRBT *parent = NULL;
     nodeRBT *current = tree->root;
 
     // Node insertion in binary search trees
     while(current != tree->nil){
         parent = current;
-        if (newNode->data < current->data)
+        if (newNode->key < current->key)
             current = current->left;
         else
             current = current->right;
@@ -76,7 +115,7 @@ void insertRBT(rbt *tree, int data){
 
     if(parent == NULL){
         tree->root = newNode;
-    }else if(newNode->data < parent->data){
+    }else if(newNode->key < parent->key){
         parent->left = newNode;
     }else{
         parent->right = newNode;
@@ -130,9 +169,10 @@ void insertRBT(rbt *tree, int data){
     }
     tree->root->color = BLACK;
 }
-void deleteRBT(rbt *tree, int data){
+
+void deleteRBT(rbt *tree, int key){
     // Search for the target node
-    nodeRBT *target = searchRBT(data);
+    nodeRBT *target = searchRBT(key);
     if (target == tree->nil) {
         fprintf(stderr, "The target node is not found.\n");
         exit(EXIT_FAILURE);
@@ -143,12 +183,7 @@ void deleteRBT(rbt *tree, int data){
     if(target->left == tree->nil || target->right == tree->nil){
         curr = target;
     }else{
-        curr = target->right;
-
-        while(curr->left != tree->nil){
-            curr = curr->left;
-        }
-    }
+        curr = findSuccessorRBT(target);
 
     if(curr->left != tree->nil){
         child = curr->left;
@@ -167,7 +202,7 @@ void deleteRBT(rbt *tree, int data){
     }
 
     if(curr != target){
-        target->data = curr->data;
+        target->key = curr->key;
     }
     // Fixup
     if(curr->color == BLACK){
@@ -235,11 +270,12 @@ void deleteRBT(rbt *tree, int data){
         child->color = BLACK;
     }
 }
-nodeRBT *searchRBT(rbt *tree, int data){
+
+nodeRBT *searchRBT(rbt *tree, int key){
     nodeRBT *current = tree->root;
 
-    while(current != tree->nil && current->data != data){
-        if(data < current->data)
+    while(current != tree->nil && current->key != key){
+        if(key < current->key)
             current = current->left;
         else
             current = current->right;
