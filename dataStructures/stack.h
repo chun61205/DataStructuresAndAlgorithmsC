@@ -3,20 +3,35 @@
 
 typedef struct{
     int data;
-}nodeStack;
+}nodeStackArray;
 
 typedef struct{
-    nodeStack *node;
+    nodeStackArray *node;
     size_t capacity;
     int top;
-}stack;
+}stackArray;
 
-stack *createStack(size_t); 
-bool isFullStack(stack*);
-bool isEmptyStack(stack*);
-stack *reallocStack(stack*, size_t);
-void pushStack(stack*, int);
-void popStack(stack*);
-//void printStack(stack*);
+typedef struct{
+    int data;
+    struct nodeStackLinkedList *next;
+}nodeStackLinkedList;
+
+typedef struct{
+    nodeStackLinkedList *top;
+}stackLinkedList;
+
+stackArray *createStackArray(size_t); 
+bool isFullStackArray(stackArray*);
+bool isEmptyStackArray(stackArray*);
+stackArray *reallocStackArray(stackArray*, size_t);
+void pushStackArray(stackArray*, int);
+void popStackArray(stackArray*);
+
+stackLinkedList *createStackLinkedList();
+nodeStackLinkedList *createNodeStackLinkedList(int);
+int isEmptyStackLinkedList(stackLinkedList*);
+void pushStackLinkedList(stackLinkedList*, int);
+void popStackLinkedList(stackLinkedList*);
+int topStackLinkedList(stackLinkedList*);
 
 #endif
