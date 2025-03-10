@@ -3,30 +3,64 @@
 
 typedef struct{
     int data;
-}nodeQueue;
+}nodeLinearQueueArray;
 
 typedef struct{
-    nodeQueue *node;
+    nodeLinearQueueArray *node;
     size_t capacity;
     int front, rear;
-}linearQueue;
+}linearQueueArray;
 
 typedef struct{
-    nodeQueue *node;
+    int data;
+}nodeCircularQueueArray;
+
+typedef struct{
+    nodeCircularQueueArray *node;
     size_t capacity;
     int front, rear;
-}circularQueue;
+}circularQueueArray;
 
-linearQueue *createLinearQueue(size_t);
-bool isFullLinearQueue(linearQueue*);
-bool isEmptyLinearQueue(linearQueue*);
-void addLinearQueue(linearQueue*, nodeQueue);
-void deleteLinearQueue(linearQueue*);
+typedef struct nodeLinearQueueLinkedList{
+    int data;
+    struct nodeLinearQueueLinkedList *next;
+}nodeLinearQueueLinkedList;
 
-circularQueue *createCircularQueue(size_t);
-bool isFullCircularQueue(circularQueue*);
-bool isEmptyCircularQueue(circularQueue*);
-void addCircularQueue(circularQueue*, nodeQueue);
-void deleteCircularQueue(circularQueue*);
+typedef struct{
+    nodeLinearQueueLinkedList *front, *rear;
+}linearQueueLinkedList;
+
+typedef struct nodeCircularQueueLinkedList{
+    int data;
+    struct nodeCircularQueueLinkedList *next;
+}nodeCircularQueueLinkedList;
+
+typedef struct{
+    nodeCircularQueueLinkedList *rear;
+}circularQueueLinkedList;
+
+linearQueueArray *createLinearQueueArray(size_t);
+bool isFullLinearQueueArray(linearQueueArray*);
+bool isEmptyLinearQueueArray(linearQueueArray*);
+void addLinearQueueArray(linearQueueArray*, nodeLinearQueueArray);
+void deleteLinearQueueArray(linearQueueArray*);
+
+circularQueueArray *createCircularQueueArray(size_t);
+bool isFullCircularQueueArray(circularQueueArray*);
+bool isEmptyCircularQueueArray(circularQueueArray*);
+void addCircularQueueArray(circularQueueArray*, nodeCircularQueueArray);
+void deleteCircularQueueArray(circularQueueArray*);
+
+linearQueueLinkedList *createLinearQueueLinkedList();
+nodeLinearQueueLinkedList *createNodeLinearQueueLinkedList(int);
+bool isEmptyLinearQueueLinkedList(linearQueueLinkedList*);
+void addLinearQueueLinkedList(linearQueueLinkedList*, int);
+void deleteLinearQueueLinkedList(linearQueueLinkedList*);
+
+circularQueueLinkedList *createCircularQueueArray();
+nodeCircularQueueLinkedList *createNodeCircularQueueArray(int);
+bool isEmptyCircularQueueLinkedList(circularQueueLinkedList*);
+void addCircularQueueLinkedList(circularQueueLinkedList*, int);
+void deleteCircularQueueLinkedList(circularQueueLinkedList*);
 
 #endif

@@ -2,13 +2,13 @@
 #include <stdbool.h>
 #include "queue.h"
 
-linearQueue *createLinearQueue(size_t capacity){
-    linearQueue *q = (linearQueue*)malloc(sizeof(linearQueue));
+linearQueueArray *createLinearQueueArray(size_t capacity){
+    linearQueueArray *q = (linearQueueArray*)malloc(sizeof(linearQueueArray));
     if(q == NULL){
         fprintf(stderr, "Memory allocation failed!\n");
         exit(EXIT_FAILURE);
     }
-    q->node = (nodeQueue*)malloc(capacity * sizeof(nodeQueue));
+    q->node = (nodeLinearQueueArray*)malloc(capacity * sizeof(nodeLinearQueueArray));
     if(q->node == NULL){
         fprintf(stderr, "Memory allocation failed!\n");
         free(q);
@@ -19,19 +19,22 @@ linearQueue *createLinearQueue(size_t capacity){
     q->rear = -1;
     return q;
 }
-bool isFullLinearQueue(linearQueue *q){
+
+bool isFullLinearQueueArray(linearQueueArray *q){
     return (q->rear >= (q->capacity - 1));
 }
-bool isEmptyLinearQueue(linearQueue *q){
+
+bool isEmptyLinearQueueArray(linearQueueArray *q){
     return (q->front == q->rear);
 }
-linearQueue *reallocLinearArrayQ(linearQueue *q, size_t newCapacity){
+
+linearQueueArray *reallocLinearQueueArray(linearQueueArray *q, size_t newCapacity){
     if(newCapacity < (q->rear + q->capacity - q->front) % q->capacity){
         fprintf(stderr, "New capacity is less than current size!\n");
         exit(EXIT_FAILURE);
     }
 
-    q->node = (nodeQueue *)realloc(q->node, newCapacity * sizeof(nodeQueue));
+    q->node = (nodeLinearQueueArray*)realloc(q->node, newCapacity * sizeof(nodeLinearQueueArray));
 
     if(q->node == NULL){
         fprintf(stderr, "Memory allocation failed!\n");
@@ -42,28 +45,31 @@ linearQueue *reallocLinearArrayQ(linearQueue *q, size_t newCapacity){
 
     return q;
 }
-void addLinearQueue(linearQueue *q, nodeQueue item){
-    if (isFullLinearQueue(q)) {
+
+void addLinearQueueArray(linearQueueArray *q, nodeLinearQueueArray item){
+    if (isFullLinearQueueArray(q)) {
         fprintf(stderr, "Queue is full!\n");
         exit(EXIT_FAILURE);
     }
     q->rear++;
     q->node[q->rear] = item;
 }
-void deleteLinearQueue(linearQueue *q){
-    if (isEmptyLinearQueue(q)) {
+
+void deleteLinearQueueArray(linearQueueArray *q){
+    if (isEmptyLinearQueueArray(q)) {
         fprintf(stderr, "Queue is empty!\n");
         exit(EXIT_FAILURE);
     }
     q->front++;
 }
-circularQueue *createCircularQueue(size_t capacity){
-    circularQueue *q = (circularQueue*)malloc(sizeof(circularQueue));
+
+circularQueueArray *createCircularQueueArray(size_t capacity){
+    circularQueueArray *q = (circularQueueArray*)malloc(sizeof(circularQueueArray));
     if(q == NULL){
         fprintf(stderr, "Memory allocation failed!\n");
         exit(EXIT_FAILURE);
     }
-    q->node = (nodeQueue*)malloc(capacity * sizeof(nodeQueue));
+    q->node = (nodeCircularQueueArray*)malloc(capacity * sizeof(nodeCircularQueueArray));
     if(q->node == NULL){
         fprintf(stderr, "Memory allocation failed!\n");
         free(q);
@@ -74,18 +80,21 @@ circularQueue *createCircularQueue(size_t capacity){
     q->rear = -1;
     return q;
 }
-bool isFullCircularQueue(circularQueue *q){
+
+bool isFullCircularQueueArray(circularQueueArray *q){
     return ((q->rear + 1) % q->capacity == q->front);
 }
-bool isEmptyCircularQueue(circularQueue *q){
+
+bool isEmptyCircularQueueArray(circularQueueArray *q){
     return (q->front == q->rear);
 }
-circularQueue *reallocCircularArrayQ(circularQueue *q, size_t newCapacity){
+
+circularQueueArray *reallocCircularQueueArray(circularQueueArray *q, size_t newCapacity){
     if(newCapacity < (q->rear + q->capacity - q->front) % q->capacity){
         fprintf(stderr, "New capacity is less than current size!\n");
         exit(EXIT_FAILURE);
     }
-    nodeQueue *newNode = (nodeQueue *)malloc(newCapacity * sizeof(nodeQueue));
+    nodeCircularQueueArray *newNode = (nodeCircularQueueArray*)malloc(newCapacity * sizeof(nodeCircularQueueArray));
     if(newNode == NULL){
         fprintf(stderr, "Memory allocation failed!\n");
         exit(EXIT_FAILURE);
@@ -114,18 +123,126 @@ circularQueue *reallocCircularArrayQ(circularQueue *q, size_t newCapacity){
 
     return q;
 }
-void addCircularQueue(circularQueue *q, nodeQueue item){
-    if (isFullCircularQueue(q)){
+
+void addCircularQueueArray(circularQueueArray *q, nodeCircularQueueArray item){
+    if (isFullCircularQueueArray(q)){
         fprintf(stderr, "Queue is full!\n");
         exit(EXIT_FAILURE);
     }
     q->rear = (q->rear + 1) % q->capacity;
     q->node[q->rear] = item;
 }
-void deleteCircularQueue(circularQueue *q){
-    if (isEmptyCircularQueue(q)){
+
+void deleteCircularQueueArray(circularQueueArray *q){
+    if (isEmptyCircularQueueArray(q)){
         fprintf(stderr, "Queue is empty!\n");
         exit(EXIT_FAILURE);
     }
     q->front = (q->front + 1) % q->capacity;
+}
+
+linearQueueLinkedList *createLinearQueueLinkedList(){
+    linearQueueLinkedList *q = (linearQueueLinkedList*)malloc(sizeof(linearQueueLinkedList));
+    if(!q){
+        fprintf(stderr, "Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+    q->front = q->rear = NULL;
+    return q;
+}
+
+nodeLinearQueueLinkedList *createNodeLinearQueueLinkedList(int data){
+    nodeLinearQueueLinkedList *newNode = (nodeLinearQueueLinkedList*)malloc(sizeof(nodeLinearQueueLinkedList));
+    if(!newNode){
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+bool isEmptyLinearQueueLinkedList(linearQueueLinkedList *queue){
+    return q->front == NULL;
+}
+
+void addLinearQueueLinkedList(linearQueueLinkedList *q, int data){
+    nodeLinearQueueLinkedList *newNode = createNodeLinearQueueLinkedList(data);
+    
+    if(isEmptyLinearQueueLinkedList(q)){
+        q->front = q->rear = newNode;
+    }else{
+        q->rear->next = newNode;
+        q->rear = newNode;
+    }
+}
+
+void deleteLinearQueueLinkedList(linearQueueLinkedList *q){
+    if(isEmptyLinearQueueLinkedList(q)){
+        return;
+    }
+    
+    nodeLinearQueueLinkedList *temp = q->front;
+    q->front = q->front->next;
+    
+    if(q->front == NULL){
+        q->rear = NULL;
+    }
+    
+    free(temp);
+}
+
+circularQueueLinkedList *createCircularQueueLinkedList(){
+    circularQueueLinkedList *q = (circularQueueLinkedList*)malloc(sizeof(circularQueueLinkedList));
+    if(!q){
+        printf("Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+    q->rear = NULL;
+    return q;
+}
+
+nodeCircularQueueLinkedList *createNodeCircularQueueArray(int data){
+    nodeCircularQueueLinkedList *newNode = (nodeCircularQueueLinkedList*)malloc(sizeof(nodeCircularQueueLinkedList));
+    if(newNode == NULL){
+        fprintf(stderr, "Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+bool isEmptyCircularQueueLinkedList(circularQueueLinkedList *q){
+    return (q->rear == NULL);
+}
+
+void addCircularQueueLinkedList(circularQueueLinkedList *q, int data){
+    nodeCircularQueueLinkedList *newNode = createNodeCircularQueueArray(data);
+    newNode->data = data;
+    
+    if(q->rear == NULL){
+        newNode->next = newNode;
+        q->rear = newNode;
+    }else{
+        newNode->next = q->rear->next;
+        q->rear->next = newNode;
+        q->rear = newNode;
+    }
+}
+
+void deleteCircularQueueLinkedList(circularQueueLinkedList *q){
+    if(isEmptyCircularQueueLinkedList(q)){
+        return;
+    }
+
+    nodeCircularQueueLinkedList *front = q->rear->next;
+    int data = front->data;
+    
+    if(q->rear == front){
+        q->rear = NULL;
+    }else{
+        q->rear->next = front->next;
+    }
+    free(front);
 }
